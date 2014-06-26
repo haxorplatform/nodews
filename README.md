@@ -24,13 +24,11 @@ It adds a layer of abstraction, allowing users to only focus on handling the dat
 * Create a Haxe Javascript project.
 * In the `main` method add:
 ```
-#!haxe
 //Starts the HTTP Server in the port 8000
 var http : HTTPServiceManager = HTTPServiceManager.Create(8000);
 ```
 * Create a class `HelloWorldService`
 ```
-#!haxe
 
 class HelloWorldService extends BaseService
 {
@@ -43,7 +41,6 @@ class HelloWorldService extends BaseService
 ```
 * Register the `HelloWorld` service in the `HTTPServiceManager`.
 ```
-#!haxe
 http.Add("/helloworld/", HelloWorldService);
 ```
 * Compile and run this example `node yourapp.js`
