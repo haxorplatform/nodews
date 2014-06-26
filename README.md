@@ -29,7 +29,6 @@ var http : HTTPServiceManager = HTTPServiceManager.Create(8000);
 ```
 * Create a class `HelloWorldService`
 ```
-
 class HelloWorldService extends BaseService
 {
     override public function OnExecute()
