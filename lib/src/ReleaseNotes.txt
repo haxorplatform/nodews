@@ -1,0 +1,6 @@
+  
+=== 0.1.0 ===
+   - initial version.
+   - SimpleDaemon to show how to start a simple server.
+   - Basic classes to create services.
+   
