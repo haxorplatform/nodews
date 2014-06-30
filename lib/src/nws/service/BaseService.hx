@@ -13,6 +13,12 @@ class BaseService
 	 */
 	public var manager : HTTPServiceManager;
 	
+	
+	/**
+	 * Contains information from the service in execution.
+	 */
+	public var session : ServiceSession;
+	
 	/**
 	 * Content Type
 	 */
@@ -35,9 +41,10 @@ class BaseService
 	public function new(p_server : HTTPServiceManager) 
 	{
 		manager  = p_server;
-		content = "text/plain";	
-		code    = 200;		
-		enabled = true;
+		session  = new ServiceSession();
+		content  = "text/plain";	
+		code     = 200;		
+		enabled  = true;
 	}
 	
 	/**
@@ -50,6 +57,14 @@ class BaseService
 	 * Method called after all data os processed on server
 	 */
 	public function OnExecute():Void {	}
+	
+	/**
+	 * Finishes the service and close the response.
+	 */
+	public function Close():Void
+	{		
+		session.response.end();
+	}
 	
 	/**
 	 * Called when the server detects an error.

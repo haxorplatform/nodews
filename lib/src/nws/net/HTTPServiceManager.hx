@@ -35,30 +35,31 @@ class HTTPServiceManager
 	 */
 	public var verbose : Int;
 	
+	
 	/**
 	 * Current ServerResponse during a OnRequest event.
 	 */
-	public var response : ServerResponse;
+	private var response : ServerResponse;
 	
 	/**
 	 * Current request data during the OnRequest event.
 	 */
-	public var request : IncomingMessage;
+	private var request : IncomingMessage;
 	
 	/**
 	 * Request method 'get' or 'post'
 	 */
-	public var method : String;
+	private var method : String;
 	
 	/**
 	 * URLData generated during the OnRequest event.
 	 */
-	public var url : URLData;
+	private var url : URLData;
 	
 	/**
 	 * Parsed data generated during a 'get' or 'post' request. The user don't need to handle the data manually.
 	 */
-	public var data : Dynamic;
+	private var data : Dynamic;
 	
 	/**
 	 * Instantiated service based on the request path. If the path does not map to any service the default one is used.
@@ -69,7 +70,6 @@ class HTTPServiceManager
 	 * Default service when the path didn't map to any other services classes.
 	 */
 	public var defaultService : BaseService;
-	
 	
 	/**
 	 * Multipart options for this content-type.
@@ -147,12 +147,18 @@ class HTTPServiceManager
 		if (m_services.exists(service_id))
 		{
 			var c : Class<BaseService> = m_services.get(service_id);
-			service = Type.createInstance(c, [this]);
+			service = Type.createInstance(c, [this]);			
 		}
 		else
 		{
 			service = defaultService;
 		}
+		
+		service.session.request  = request;
+		service.session.response = response;
+		service.session.method   = method;
+		service.session.url      = url;
+		
 		
 		service.OnInitialize();
 		response.setHeader("content-type", service.content);
@@ -223,9 +229,9 @@ class HTTPServiceManager
 	 */
 	private function OnRequestComplete()
 	{
-		Log("HTTP> OnRequestComplete ["+Type.getClassName(Type.getClass(service))+"] url[" + request.url + "]", 1);	
-		service.OnExecute();
-		response.end();
+		Log("HTTP> OnRequestComplete [" + Type.getClassName(Type.getClass(service)) + "] url[" + request.url + "]", 1);	
+		service.session.data = data;
+		service.OnExecute();		
 	}
 	
 	/**
