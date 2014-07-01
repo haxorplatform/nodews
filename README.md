@@ -28,7 +28,7 @@ It adds a layer of abstraction, allowing users to only focus on handling the dat
 var http : HTTPServiceManager = HTTPServiceManager.Create(8000);
 ```
 * Create a class `HelloWorldService`
-```
+```haxe
 class HelloWorldService extends BaseService
 {
     override public function OnExecute()
@@ -39,7 +39,7 @@ class HelloWorldService extends BaseService
 }  
 ```
 * Register the `HelloWorld` service in the `HTTPServiceManager`.
-```
+```haxe
 http.Add("/helloworld/", HelloWorldService);
 ```
 * Compile and run this example `node yourapp.js`
