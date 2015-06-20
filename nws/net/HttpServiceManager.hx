@@ -240,7 +240,7 @@ class HttpServiceManager
 	private function OnError(p_error:Error):Void
 	{		
 		service.OnError(p_error);
-		response.end();
+		if(response != null) response.end();
 	}
 	
 	/**
