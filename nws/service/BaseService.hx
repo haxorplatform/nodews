@@ -1,8 +1,9 @@
 package nws.service;
 import haxe.rtti.Meta;
 import haxe.rtti.Rtti;
+import js.Error;
 import js.node.http.Method;
-import nws.net.HttpServiceManager;
+import nws.net.HttpApplication;
 
 /**
  * Base class for implementing a web service. The user only needs to process the data and write the response for the server.
@@ -14,7 +15,7 @@ class BaseService
 	/**
 	 * Server running this service.
 	 */
-	public var manager : HttpServiceManager;
+	public var application : HttpApplication;
 	
 	/**
 	 * Contains information from the service in execution.
@@ -65,7 +66,7 @@ class BaseService
 	public function OnInitialize():Void	{}
 	
 	/**
-	 * Method called after all data os processed on server
+	 * Method called after all data and routes was processed.
 	 */
 	public function OnExecute():Void { }
 	
@@ -90,7 +91,6 @@ class BaseService
 			var meta_field : String = "";
 			untyped __js__('for (var s in d) { meta_field = s;');
 			
-			var fn    : Dynamic = untyped ref[meta_field];
 			var route : Dynamic = untyped d[meta_field].route;
 			//if has route metadata				
 			if (route != null)
@@ -106,13 +106,12 @@ class BaseService
 					{
 						var opt  : String = route.length >= 3 ? route[2] : "";
 						var rule : String = route[1];
-						var er : EReg = new EReg(rule, opt);	
-						trace(er);
+						var er : EReg = new EReg(rule, opt);							
 						if (session.url != null)
 						{
 							if (er.match(session.url.pathname))
 							{
-								fn();
+								untyped ref[meta_field]();
 							}
 						}
 					}					
@@ -139,12 +138,12 @@ class BaseService
 	 * @param	p_msg
 	 * @param	p_level
 	 */
-	public function Log(p_msg:Dynamic, p_level:Int = 0):Void { manager.Log(p_msg, p_level); }
+	public function Log(p_msg:Dynamic, p_level:Int = 0):Void { application.Log(p_msg, p_level); }
 	
 	
 	/**
 	 * Called when the server detects an error.
 	 * @param	p_error
 	 */
-	public function OnError(p_error : Dynamic):Void	{	}
+	public function OnError(p_error : Error):Void	{	}
 }

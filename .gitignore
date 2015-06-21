@@ -2,5 +2,6 @@ deploy/
 *.ini
 *.bat
 *.hxproj
+Main.hx
 
 

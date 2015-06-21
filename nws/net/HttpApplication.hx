@@ -1,6 +1,8 @@
 package nws.net;
 import js.Error;
+import js.Node;
 import js.node.http.Method;
+import js.node.Querystring;
 import js.node.stream.Readable;
 import js.node.Url;
 import nws.service.BaseService;
@@ -15,16 +17,16 @@ import js.node.net.Socket;
  * Wrapper for the HTTP module of nodejs. Handles incoming requests by checking their 'path' and mapping them to registered BaseServices the user created.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
-class HttpServiceManager
+class HttpApplication
 {
 	/**
 	 * Create and start listening for a new HTTPServer in a given port.
 	 * @param	p_port
 	 * @return
 	 */
-	static public function Create(p_port : Int = 80):HttpServiceManager
+	static public function Create(p_port : Int = 80):HttpApplication
 	{
-		var s : HttpServiceManager = new HttpServiceManager();
+		var s : HttpApplication = new HttpApplication();
 		s.Listen(p_port);
 		return s;
 	}
@@ -91,19 +93,10 @@ class HttpServiceManager
 	 * Adds a WebService and maps it to a given request path.
 	 * @param	p_id
 	 * @param	p_service_class
-	 */
-	@:overload(function(p_rule:String,p_service_class : Class<BaseService>):Void {})
-	public function Add(p_rule:EReg, p_service_class : Class<BaseService>):Void
+	 */	
+	public function Add(p_service_class : Class<BaseService>,p_rule:String,p_opt:String=""):Void
 	{
-		var ereg : EReg;
-		if (Std.is(p_rule, String))
-		{
-			ereg = new EReg(cast p_rule, "");
-		}
-		else
-		{
-			ereg = cast p_rule;
-		}
+		var ereg : EReg = new EReg(p_rule,p_opt);
 		var e : ServiceEntry = new ServiceEntry(ereg, p_service_class);
 		m_services.push(e);
 	}
@@ -145,7 +138,7 @@ class HttpServiceManager
 				var s : BaseService  = e.GetInstance();				
 				service = s;
 				if (s == null) continue;
-				s.manager		   = this;
+				s.application	   = this;
 				s.session.request  = request;
 				s.session.response = response;
 				s.session.method   = method;
@@ -189,7 +182,7 @@ class HttpServiceManager
 		{
 			case Method.Get:
 				var d :Dynamic = null;
-				if (url.query != null) d = Url.parse(url.query,true);
+				if (url.query != null) d = Querystring.parse(url.query);
 				data = d;				
 				OnRequestLoad();
 				OnRequestComplete();
@@ -208,7 +201,7 @@ class HttpServiceManager
 			
 			default:	
 				var d :Dynamic = null;
-				if (url.query != null) d = Url.parse(url.query,true);
+				if (url.query != null) d = Querystring.parse(url.query);
 				data = d;		
 				OnRequestLoad();	
 				OnRequestComplete();
@@ -224,6 +217,7 @@ class HttpServiceManager
 		Log("Http> OnRequestLoad [" + Type.getClassName(Type.getClass(service)) + "]", 2);	
 		service.session.data = data;
 		service.Execute();
+		
 	}
 	
 	/**
