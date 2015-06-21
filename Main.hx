@@ -10,6 +10,8 @@ import js.node.net.Socket;
 import js.node.Os;
 import js.node.Process;
 import js.node.Process.ProcessEvent;
+import nws.service.BaseService;
+
 
 /**
  * Entry point for the website services daemon.
@@ -32,11 +34,14 @@ class Main
 		
 		server.verbose = 0;
 		
+		
+		
 		//Check args for [-vvv...] and set the level of verbose.
 		for (a in Node.process.argv) if (a.indexOf("-v") >= 0) server.verbose = a.length - 1;
 		
 		trace("Process> Verbose Level ["+server.verbose+"]");		
 		Node.process.on(ProcessEvent.UncaughtException, OnError);
+		
 	}
 	
 	/**

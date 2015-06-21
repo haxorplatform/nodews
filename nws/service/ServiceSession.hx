@@ -3,6 +3,7 @@ import haxe.Timer;
 import js.node.http.IncomingMessage;
 import js.node.http.Method;
 import js.node.http.ServerResponse;
+import js.node.Url.UrlData;
 
 
 /**
@@ -29,7 +30,7 @@ class ServiceSession
 	/**
 	 * URLData generated during the OnRequest event.
 	 */
-	public var url : Dynamic;
+	public var url : UrlData;
 	
 	/**
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
