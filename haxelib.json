@@ -6,9 +6,5 @@
   "description": "nodejs HTTP Web Services",
   "version": "0.2.0",
   "releasenote": "Web Services framework for nodejs",
-  "contributors": ["eduardo-costa"],
-  "dependencies": 
-  {
-	  "hxnodejs" : "*"
-  }
+  "contributors": ["eduardo-costa"]  
 }
