@@ -80,17 +80,42 @@ class BaseService
 	 */
 	public function Execute():Void 
 	{
-		//fetches the RTTI and execute the functions
-		var c : Class<BaseService> = Type.getClass(this);
+		//fetches the RTTI and execute the functions		
+		var c : Class<BaseService> = Type.getClass(this);		
+		var has_found : Bool = false; 		
+		while (c != null)
+		{			
+			has_found = ExecuteRoutes(c) || has_found;
+			c = cast Type.getSuperClass(c);
+		}
+		
+		if (!has_found) 
+		{
+			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.",1);
+		}
+		
+		//Call execution callback.
+		OnExecute();
+	}
+	
+	/**
+	 * Search and execute routes in a given type.
+	 * @param	p_type
+	 * @return
+	 */
+	public function ExecuteRoutes(p_type : Class <BaseService>):Bool
+	{
+		var c : Class<BaseService> = p_type;
 		var d : Array<Dynamic> = cast Meta.getFields(c);
 		var has_found : Bool = false;
 		if (d != null)
-		{
-			var ref : Dynamic = this;
+		{			
+			var ref : Dynamic = this;			
 			var ms  : String = cast session.method;
 			ms = ms.toLowerCase();
 			var meta_field : String = "";
 			untyped __js__('for (var s in d) { meta_field = s;');
+			
 			
 			var route : Dynamic = untyped d[meta_field].route;
 			//if has route metadata				
@@ -119,17 +144,9 @@ class BaseService
 					}					
 				}
 			}				
-			untyped __js__('}');
-			
+			untyped __js__('}');			
 		}
-		
-		if (!has_found) 
-		{
-			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.",1);
-		}
-		
-		//Call execution callback.
-		OnExecute();
+		return has_found;
 	}
 	
 	/**
