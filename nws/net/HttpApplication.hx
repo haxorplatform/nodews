@@ -122,7 +122,16 @@ class HttpApplication
 		request  = p_request;
 		response = p_response;
 		method   = p_request.method;
-		url 	 = Url.parse(p_request.url);
+		try
+		{
+			url 	 = Url.parse(p_request.url);
+		}
+		catch (err:Error)
+		{
+			trace("Http> Error parsing URL");
+			trace(p_request.url);
+			url = { pathname:"" };
+		}
 		
 		var service_path : String = url.pathname;
 		
@@ -215,9 +224,8 @@ class HttpApplication
 	private function OnRequestLoad()
 	{
 		Log("Http> OnRequestLoad [" + Type.getClassName(Type.getClass(service)) + "]", 2);	
-		service.session.data = data;
-		service.Execute();
-		
+		service.session.data = data==null ? {} : data;
+		service.Execute();		
 	}
 	
 	/**
