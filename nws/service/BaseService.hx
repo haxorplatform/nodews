@@ -83,6 +83,7 @@ class BaseService
 		//fetches the RTTI and execute the functions
 		var c : Class<BaseService> = Type.getClass(this);
 		var d : Array<Dynamic> = cast Meta.getFields(c);
+		var has_found : Bool = false;
 		if (d != null)
 		{
 			var ref : Dynamic = this;
@@ -111,6 +112,7 @@ class BaseService
 						{
 							if (er.match(session.url.pathname))
 							{
+								has_found = true;
 								untyped ref[meta_field]();
 							}
 						}
@@ -119,6 +121,11 @@ class BaseService
 			}				
 			untyped __js__('}');
 			
+		}
+		
+		if (!has_found) 
+		{
+			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.",1);
 		}
 		
 		//Call execution callback.
