@@ -129,7 +129,7 @@ class HttpApplication
 		catch (err:Error)
 		{
 			trace("Http> Error parsing URL");
-			trace(p_request.url);
+			trace(p_request);
 			url = { pathname:"" };
 		}
 		
