@@ -137,7 +137,7 @@ class HttpApplication
 		
 		var el : Array<ServiceEntry> = FindAll(service_path);
 		
-		Log("Http> RequestHandler url[" + request.url + "] service["+service_path+"] method[" + method + "] ip["+request.socket.remoteAddress+":"+request.socket.remotePort+"]", 1);						
+		Log("Http> RequestHandler url[" + request.url + "] service["+service_path+"]["+el.length+"] method[" + method + "] ip["+request.socket.remoteAddress+":"+request.socket.remotePort+"]", 1);						
 		
 		if (el.length>0)
 		{
