@@ -204,37 +204,46 @@ class HttpApplication
 				OnRequestComplete();
 				
 			case Method.Post:
-								
-				request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
-				{	
-					try
-					{
-						if (Std.is(p_data, String))
-						{							
-							data = Url.parse(cast p_data, true);
-						}
-						else
-						if (Std.is(p_data, Buffer))
-						{
-							var b : Buffer = cast p_data;
-							buffer = b;
-							try { data = b.toJSON(); } 
-							catch (err:Error) { data = b.toString(); }
-						}
-					}
-					catch (err:Error)
-					{
-						Log("Http> Error parsing POST data.");
-						Log(p_data);
-						Log(err.message);
-					}
-				});
 				
-				request.on(ReadableEvent.End, function():Void
-				{					
+				//If request has multipart content, let the user handle it with his module of choice.
+				if (service.session.multipart)
+				{
 					OnRequestLoad();
 					OnRequestComplete();
-				});			
+				}
+				else
+				{
+					request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
+					{	
+						try
+						{
+							if (Std.is(p_data, String))
+							{							
+								data = Url.parse(cast p_data, true);
+							}
+							else
+							if (Std.is(p_data, Buffer))
+							{
+								var b : Buffer = cast p_data;
+								buffer = b;
+								try { data = b.toJSON(); } 
+								catch (err:Error) { data = b.toString(); }
+							}
+						}
+						catch (err:Error)
+						{
+							Log("Http> Error parsing POST data.");
+							Log(p_data);
+							Log(err.message);
+						}
+					});
+					
+					request.on(ReadableEvent.End, function():Void
+					{					
+						OnRequestLoad();
+						OnRequestComplete();
+					});		
+				}
 			
 			default:	
 				var d :Dynamic = null;
@@ -278,6 +287,18 @@ class HttpApplication
 	private function OnError(p_error:Error,p_socket:Socket):Void
 	{		
 		service.OnError(p_error);
+		if (response != null)
+		{
+			response.statusCode = 500;
+			response.end();
+		}
+	}
+	
+	/**
+	 * Emits a status 500 error for some reason.
+	 */
+	public function Abort():Void
+	{
 		if (response != null)
 		{
 			response.statusCode = 500;
