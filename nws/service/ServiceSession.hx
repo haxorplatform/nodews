@@ -47,7 +47,12 @@ class ServiceSession
 	 * Flag that indicates if the incoming content is multipart/form
 	 */
 	public var multipart(get, null):Bool;
-	private function get_multipart():Bool { return request == null ? false : (request.headers["content-type"].toLowerCase().indexOf("multipart") >= 0); }
+	private function get_multipart():Bool 
+	{ 
+		if (request == null) return false;
+		if (!request.headers.exists("content-type")) return false;		
+		return request.headers["content-type"].toLowerCase().indexOf("multipart") >= 0;	
+	}
 	
 	/**
 	 * Http Status Code.

@@ -67,7 +67,12 @@ class HttpApplication
 	private var buffer : Buffer;
 	
 	/**
-	 * Instantiated service based on the request path.
+	 * Flag that indicates that the current request is a multipart one.
+	 */
+	private var multipart : Bool;
+	
+	/**
+	 * Currently running service based on the request path.
 	 */
 	public var service : BaseService;
 	
@@ -123,12 +128,14 @@ class HttpApplication
 	 */
 	private function RequestHandler(p_request : IncomingMessage, p_response : ServerResponse):Void
 	{
-		request  = p_request;
-		response = p_response;
-		method   = p_request.method;
+		request   = p_request;
+		response  = p_response;
+		method    = p_request.method;
+		multipart = false;
+		
 		try
 		{
-			url 	 = Url.parse(p_request.url);
+			url = Url.parse(p_request.url);
 		}
 		catch (err:Error)
 		{
@@ -197,6 +204,20 @@ class HttpApplication
 				OnRequestComplete();
 				
 			case Method.Post:
+				
+				//if the current session contain multipart data
+				if (service.session.multipart)
+				{
+					//checks if NPM's multiparty is loaded
+					if (HasModule("multiparty"))
+					{
+						//process using multiparty					
+						trace("Http> Using multiparty");
+						response.statusCode = 200;
+						response.end();
+						return;
+					}
+				}
 				
 				request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
 				{	
@@ -317,5 +338,18 @@ class HttpApplication
 			if (e.rule.match(p_path)) res.push(e);
 		}
 		return res;
+	}
+	
+	/**
+	 * Checks if a given 'require' module exists.
+	 * @param	p_module
+	 * @return
+	 */
+	public function HasModule(p_module:String):Bool
+	{
+		var exists : Bool = true;		
+		try { Node.require_resolve(p_module); }
+		catch (err:Error) { exists = false; }
+		return exists;		
 	}
 }
