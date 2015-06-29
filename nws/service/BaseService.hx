@@ -21,17 +21,7 @@ class BaseService
 	 * Contains information from the service in execution.
 	 */
 	public var session : ServiceSession;
-	
-	/**
-	 * Content Type
-	 */
-	public var content : String;
-	
-	/**
-	 * Response Code
-	 */
-	public var code : Int;
-	
+		
 	/**
 	 * Flag that indicates if the service will run.
 	 */
@@ -48,9 +38,7 @@ class BaseService
 	 */
 	public function new()
 	{		
-		session  = new ServiceSession();
-		content  = "text/plain";
-		code     = 200;		
+		session  = new ServiceSession();			
 		enabled  = true;
 	}
 	
@@ -106,7 +94,7 @@ class BaseService
 	public function ExecuteRoutes(p_type : Class <BaseService>):Bool
 	{
 		var c : Class<BaseService> = p_type;
-		var d : Array<Dynamic> = cast Meta.getFields(c);
+		var d : Array<Dynamic> = cast Meta.getFields(c);		
 		var has_found : Bool = false;
 		if (d != null)
 		{			

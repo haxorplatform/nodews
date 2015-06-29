@@ -58,7 +58,7 @@ class HttpApplication
 	 * URLData generated during the OnRequest event.
 	 */
 	private var url : UrlData;
-	
+		
 	/**
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
 	 * It also stores the Buffer if appliable.
@@ -158,11 +158,7 @@ class HttpApplication
 				s.session.url      = url;				
 				
 				s.OnInitialize();
-				
-				//Prepare with intermediate status-code and content
-				response.statusCode = s.code;
-				response.setHeader("content-type", s.content);
-				
+								
 				if (s.enabled)
 				{
 					OnRequest();
@@ -202,8 +198,6 @@ class HttpApplication
 				
 			case Method.Post:
 				
-				
-				
 				request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
 				{	
 					try
@@ -225,7 +219,7 @@ class HttpApplication
 					{
 						Log("Http> Error parsing POST data.");
 						Log(p_data);
-						Log(err.message);						
+						Log(err.message);
 					}
 				});
 				
@@ -251,8 +245,9 @@ class HttpApplication
 	private function OnRequestLoad()
 	{
 		Log("Http> OnRequestLoad [" + Type.getClassName(Type.getClass(service)) + "]", 2);	
-		service.session.data = data==null ? {} : data;
-		service.Execute();		
+		if (data != null)   service.session.data   = data;
+		if (buffer != null) service.session.buffer = buffer;
+		service.Execute();
 	}
 	
 	/**

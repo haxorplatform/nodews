@@ -1,5 +1,6 @@
 package nws.service;
 import haxe.Timer;
+import js.node.Buffer;
 import js.node.http.IncomingMessage;
 import js.node.http.Method;
 import js.node.http.ServerResponse;
@@ -36,7 +37,18 @@ class ServiceSession
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
 	 */
 	public var data : Dynamic;
+	
+	/**
+	 * Request buffer. When appliable.
+	 */
+	public var buffer : Buffer;
 
+	/**
+	 * Flag that indicates if the incoming content is multipart/form
+	 */
+	public var multipart(get, null):Bool;
+	private function get_multipart():Bool { return request == null ? false : (request.headers["content-type"].toLowerCase().indexOf("multipart") >= 0); }
+	
 	/**
 	 * Http Status Code.
 	 */
@@ -64,6 +76,8 @@ class ServiceSession
 	public function new() 
 	{		
 		method = Method.Post;
+		buffer = new Buffer(0);
+		data   = { };
 	}
 	
 	
