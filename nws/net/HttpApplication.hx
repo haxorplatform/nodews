@@ -204,21 +204,7 @@ class HttpApplication
 				OnRequestComplete();
 				
 			case Method.Post:
-				
-				//if the current session contain multipart data
-				if (service.session.multipart)
-				{
-					//checks if NPM's multiparty is loaded
-					if (HasModule("multiparty"))
-					{
-						//process using multiparty					
-						trace("Http> Using multiparty");
-						response.statusCode = 200;
-						response.end();
-						return;
-					}
-				}
-				
+								
 				request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
 				{	
 					try
