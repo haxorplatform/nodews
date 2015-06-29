@@ -1,6 +1,8 @@
 package nws.net;
+import haxe.extern.EitherType;
 import js.Error;
 import js.Node;
+import js.node.Buffer;
 import js.node.http.Method;
 import js.node.Querystring;
 import js.node.stream.Readable;
@@ -59,8 +61,10 @@ class HttpApplication
 	
 	/**
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
+	 * It also stores the Buffer if appliable.
 	 */
 	private var data : Dynamic;
+	private var buffer : Buffer;
 	
 	/**
 	 * Instantiated service based on the request path.
@@ -197,9 +201,32 @@ class HttpApplication
 				OnRequestComplete();
 				
 			case Method.Post:
-				request.on(ReadableEvent.Data, function(p_data : String):Void
-				{						
-					data = Url.parse(p_data,true);					
+				
+				
+				
+				request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
+				{	
+					try
+					{
+						if (Std.is(p_data, String))
+						{							
+							data = Url.parse(cast p_data, true);
+						}
+						else
+						if (Std.is(p_data, Buffer))
+						{
+							var b : Buffer = cast p_data;
+							buffer = b;
+							try { data = b.toJSON(); } 
+							catch (err:Error) { data = b.toString(); }
+						}
+					}
+					catch (err:Error)
+					{
+						Log("Http> Error parsing POST data.");
+						Log(p_data);
+						Log(err.message);						
+					}
 				});
 				
 				request.on(ReadableEvent.End, function():Void
