@@ -184,6 +184,8 @@ class HttpApplication
 			response.end();
 		}
 		
+		response = null;
+		request  = null;
 	}
 	
 	/**
@@ -192,7 +194,7 @@ class HttpApplication
 	 */
 	private function OnRequest():Void
 	{
-		Log("Http> OnRequest method[" + method + "] url[" + request.url + "]", 1);	
+		Log("Http> OnRequest method[" + method + "] url[" + request.url + "] content["+request.headers["content-type"]+"]", 1);	
 		data = null;
 		switch(method)
 		{
