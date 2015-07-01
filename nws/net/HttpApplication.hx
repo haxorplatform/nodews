@@ -1,5 +1,6 @@
 package nws.net;
 import haxe.extern.EitherType;
+import haxe.Json;
 import js.Error;
 import js.Node;
 import js.node.Buffer;
@@ -228,7 +229,7 @@ class HttpApplication
 							{
 								var b : Buffer = cast p_data;
 								buffer = b;
-								try { data = b.toJSON(); } 
+								try { data = Json.parse(b.toString()); } 
 								catch (err:Error) { data = b.toString(); }
 							}
 						}
