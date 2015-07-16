@@ -31,7 +31,12 @@ class BaseService
 	 * Flag that indicates this instance will be stored after creation.
 	 */
 	public var persistent : Bool;
-
+	
+	/**
+	 * RegExp that route requests to this service.
+	 */
+	public var route : EReg;
+	
 	/**
 	 * Creates a new web service.
 	 * @param	p_server
@@ -40,6 +45,7 @@ class BaseService
 	{		
 		session  = new ServiceSession();			
 		enabled  = true;
+		route    = new EReg("(.*?)","");
 	}
 	
 	/**
@@ -61,7 +67,13 @@ class BaseService
 	/**
 	 * Method called when this instance will be destroyed before a new one is created.
 	 */
-	public function OnDestroy():Void {}
+	public function OnDestroy():Void { }
+	
+	/**
+	 * Callback called after the response sent all data after .end()
+	 */
+	public function OnFinish():Void { }
+	
 	
 	/**
 	 * Executes all methods related to the desired route and http-method.
@@ -79,7 +91,10 @@ class BaseService
 		
 		if (!has_found) 
 		{
-			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.",1);
+			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.", 1);
+			var err : Error = new Error("Route ["+session.url.pathname+"] Not Found.");
+			err.name = "route_not_found";
+			OnError(err);
 		}
 		
 		//Call execution callback.

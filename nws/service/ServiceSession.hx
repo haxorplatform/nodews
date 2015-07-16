@@ -11,6 +11,7 @@ import js.node.Url.UrlData;
  * Class that contains the reference for HTTP information during the BaseService execution.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
+@:allow(nws)
 class ServiceSession
 {
 	/**
@@ -76,6 +77,25 @@ class ServiceSession
 	private function set_length(v:Int):Int 		{ if (response != null) response.setHeader("content-length",v+""); return v; }
 	
 	/**
+	 * Flag that indicates the response was sent to client.
+	 */
+	public var finished(get, never):Bool;
+	private function get_finished():Bool { return m_finished; }
+	private var m_finished : Bool;
+	
+	/**
+	 * Flag that indicates if the session is still valid and usable.
+	 */
+	public var valid(get, never):Bool;
+	private function get_valid():Bool
+	{
+		if (request == null) return false;
+		if (response == null) return false;		
+		if (m_finished) return false;
+		return true;
+	}
+	
+	/**
 	 * Creates the service session.
 	 */
 	public function new() 
@@ -83,6 +103,7 @@ class ServiceSession
 		method = Method.Post;
 		buffer = new Buffer(0);
 		data   = { };
+		m_finished = false;
 	}
 	
 	

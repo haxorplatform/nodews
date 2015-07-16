@@ -27,10 +27,11 @@ class HttpApplication
 	 * @param	p_port
 	 * @return
 	 */
-	static public function Create(p_port : Int = 80):HttpApplication
+	static public function Create(p_port : Int = 80,p_start:Bool=true):HttpApplication
 	{
 		var s : HttpApplication = new HttpApplication();
-		s.Listen(p_port);
+		s.m_port = p_port;
+		if(p_start)s.Listen();
 		return s;
 	}
 	
@@ -39,6 +40,12 @@ class HttpApplication
 	 */
 	public var verbose : Int;
 	
+	/**
+	 * Port Number
+	 */
+	public var port(get, never):Int;
+	private function get_port():Int { return m_port; }
+	private var m_port:Int;
 	
 	/**
 	 * Current ServerResponse during a OnRequest event.
@@ -88,15 +95,24 @@ class HttpApplication
 	private var m_services : Array<ServiceEntry>;
 
 	/**
+	 * Installed plugins list.
+	 */
+	public var plugins(get, never):Array<Plugin>;
+	private function get_plugins():Array<Plugin> { return m_plugins; }
+	private var m_plugins : Array<Plugin>;
+	
+	/**
 	 * Creates a new HTTPServer without starting the listening.
 	 */
 	public function new() 
 	{
 		m_services  = [];
+		m_plugins	= [];
 		server 	= Http.createServer(RequestHandler);		
 		server.on(ServerEvent.Connection,     OnConnection);		
 		server.on(ServerEvent.ClientError, 	  OnError);			
 		verbose = 0;
+		m_port  = 80;
 	}
 	
 	/**
@@ -104,21 +120,36 @@ class HttpApplication
 	 * @param	p_id
 	 * @param	p_service_class
 	 */	
-	public function Add(p_service_class : Class<BaseService>,p_rule:String,p_opt:String=""):Void
+	public function Add(p_service_class : Class<BaseService>,p_rule:String="",p_opt:String=""):Void
 	{
+		p_rule = p_rule == "" ? "(.?*)" : p_rule;
 		var ereg : EReg = new EReg(p_rule,p_opt);
 		var e : ServiceEntry = new ServiceEntry(ereg, p_service_class);
 		m_services.push(e);
 	}
 	
 	/**
+	 * Loads a plugin into the application scope.
+	 * @param	p_plugin_class
+	 */
+	public function Load(p_plugin_class : Class<Plugin>):Plugin
+	{
+		var p : Plugin = Type.createInstance(p_plugin_class, []);
+		p.m_application = this;
+		p.OnLoad();
+		m_plugins.push(p);
+		return p;
+	}
+	
+	/**
 	 * Starts listening to a network port.
 	 * @param	p_port
 	 */
-	public function Listen(p_port : Int = 80):Void
+	public function Listen(p_port : Int = -1):Void
 	{
-		Log("Http> Listening Port ["+p_port+"]");
-		server.listen(p_port);
+		if (p_port >= 0) m_port = p_port;
+		Log("Http> Listening Port ["+m_port+"]");
+		server.listen(m_port);
 	}
 	
 	/**	
@@ -133,6 +164,8 @@ class HttpApplication
 		response  = p_response;
 		method    = p_request.method;
 		multipart = false;
+		
+		
 		
 		try
 		{
@@ -160,15 +193,26 @@ class HttpApplication
 				service = s;
 				if (s == null) continue;
 				s.application	   = this;
-				s.session.request  = request;
-				s.session.response = response;
-				s.session.method   = method;
-				s.session.url      = url;				
+				s.session.m_finished = false;
+				s.session.request    = request;
+				s.session.response   = response;
+				s.session.method     = method;
+				s.session.url        = url;
+				
+				response.on("finish", function()
+				{
+					for (i in 0...m_plugins.length) m_plugins[i].OnServiceEnd(s);
+					s.OnFinish();
+					s.session.response.removeAllListeners();
+					s.session.request  = null;
+					s.session.response = null;
+					s.session.m_finished = true;					
+				});
 				
 				s.OnInitialize();
 								
 				if (s.enabled)
-				{
+				{					
 					OnRequest();
 				}
 				else
@@ -230,7 +274,10 @@ class HttpApplication
 								var b : Buffer = cast p_data;
 								buffer = b;
 								try { data = Json.parse(b.toString()); } 
-								catch (err:Error) { data = b.toString(); }
+								catch (err:Error) 
+								{									
+									data = b.toString();
+								}
 							}
 						}
 						catch (err:Error)
@@ -266,7 +313,8 @@ class HttpApplication
 		Log("Http> OnRequestLoad [" + Type.getClassName(Type.getClass(service)) + "]", 2);	
 		if (data != null)   service.session.data   = data;
 		if (buffer != null) service.session.buffer = buffer;
-		service.Execute();
+		for (i in 0...m_plugins.length) m_plugins[i].OnServiceBegin(service);
+		service.Execute();		
 	}
 	
 	/**
@@ -289,24 +337,36 @@ class HttpApplication
 	 */
 	private function OnError(p_error:Error,p_socket:Socket):Void
 	{		
-		service.OnError(p_error);
+		Throw(p_error);
+	}
+	
+	/**
+	 * Throws an error and if appliable returns a status code.
+	 * @param	p_error
+	 * @param	p_status_code
+	 */
+	public function Throw(p_error:Error, p_status_code:Int = 500):Void
+	{		
 		if (response != null)
 		{
-			response.statusCode = 500;
+			response.statusCode = p_status_code;
 			response.end();
+		}
+		
+		if (p_error != null)
+		{
+			if(service!=null) service.OnError(p_error);
+			for (i in 0...m_plugins.length) m_plugins[i].OnError(p_error);
 		}
 	}
 	
 	/**
-	 * Emits a status 500 error for some reason.
+	 * Emits an error status (500 by default).
+	 * @param	p_code
 	 */
-	public function Abort():Void
+	public function Abort(p_code:Int=500):Void
 	{
-		if (response != null)
-		{
-			response.statusCode = 500;
-			response.end();
-		}
+		Throw(null, p_code);
 	}
 	
 	/**

@@ -43,10 +43,14 @@ class ServiceEntry
 	{
 		if (instance != null)
 		{
-			if (instance.persistent) return instance;
+			if (instance.persistent)
+			{				
+				return instance;
+			}
 			instance.OnDestroy();
 		}
 		instance = Type.createInstance(service, []);
+		instance.route = rule;
 		instance.OnCreate();
 		return instance;
 	}
