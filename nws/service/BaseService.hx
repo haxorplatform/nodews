@@ -141,7 +141,7 @@ class BaseService
 							if (er.match(session.url.pathname))
 							{
 								has_found = true;
-								if (OnMeta(untyped d[meta_field],untyped ref[meta_field]))
+								if (OnMeta(untyped d[meta_field], function() { untyped ref[meta_field](); } ))
 								{
 									untyped ref[meta_field]();
 								}
