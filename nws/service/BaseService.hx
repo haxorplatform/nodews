@@ -141,7 +141,10 @@ class BaseService
 							if (er.match(session.url.pathname))
 							{
 								has_found = true;
-								untyped ref[meta_field]();
+								if (OnMeta(untyped d[meta_field],untyped ref[meta_field]))
+								{
+									untyped ref[meta_field]();
+								}
 							}
 						}
 					}					
@@ -173,4 +176,14 @@ class BaseService
 	 * @param	p_error
 	 */
 	public function OnError(p_error : Error):Void	{	}
+	
+	/**
+	 * Callback called when a metadata is processed.
+	 * Users can intercept the call of the route's method and do some steps before it.
+	 * Execution can be resumed calling the 'onready' callback.
+	 * @param	p_meta
+	 * @param	p_on_ready
+	 * @return
+	 */
+	public function OnMeta(p_meta:Dynamic, p_onready : Void->Void) : Bool { return true; }
 }
