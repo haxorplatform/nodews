@@ -25,7 +25,7 @@ class Plugin
 	/**
 	 * Callback called when the plugin is loaded. The application is available.
 	 */
-	public function OnLoad():Void {	}
+	public function OnLoad(p_args : Array<Dynamic>):Void {}
 	
 	/**
 	 * Callback called before service.Execute()

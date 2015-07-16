@@ -132,11 +132,11 @@ class HttpApplication
 	 * Loads a plugin into the application scope.
 	 * @param	p_plugin_class
 	 */
-	public function Load(p_plugin_class : Class<Plugin>):Plugin
+	public function Load(p_plugin_class : Class<Plugin>,p_args : Array<Dynamic>=null):Plugin
 	{
 		var p : Plugin = Type.createInstance(p_plugin_class, []);
 		p.m_application = this;
-		p.OnLoad();
+		p.OnLoad(p_args=null ? [] : p_args);
 		m_plugins.push(p);
 		return p;
 	}
