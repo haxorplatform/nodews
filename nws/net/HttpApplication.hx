@@ -411,6 +411,29 @@ class HttpApplication
 	}
 	
 	/**
+	 * Searches the first occurence of a plugin of a given type.
+	 * @param	p_type
+	 * @return
+	 */
+	public function FindPlugin(p_type : Class<Plugin>):Plugin
+	{
+		for (i in 0...m_plugins.length) if (Std.is(m_plugins[i], p_type)) return m_plugins[i];
+		return null;
+	}
+	
+	/**
+	 * Finds all occurences of plugins of a given type.
+	 * @param	p_type
+	 * @return
+	 */
+	public function FindAllPlugins(p_type : Class<Plugin>):Array<Plugin>
+	{
+		var res : Array<Plugin> = [];
+		for (i in 0...m_plugins.length) if (Std.is(m_plugins[i], p_type)) res.push(m_plugins[i]);
+		return res;
+	}
+	
+	/**
 	 * Checks if a given 'require' module exists.
 	 * @param	p_module
 	 * @return
