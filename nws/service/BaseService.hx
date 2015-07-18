@@ -38,6 +38,11 @@ class BaseService
 	public var route : EReg;
 	
 	/**
+	 * Origins allowed for this service.
+	 */
+	public var allowOrigin : String;
+	
+	/**
 	 * Creates a new web service.
 	 * @param	p_server
 	 */
@@ -45,7 +50,8 @@ class BaseService
 	{		
 		session  = new ServiceSession();			
 		enabled  = true;
-		route    = new EReg("(.*?)","");
+		route    = new EReg("(.*?)", "");
+		allowOrigin	 = "*";
 	}
 	
 	/**
@@ -80,6 +86,12 @@ class BaseService
 	 */
 	public function Execute():Void 
 	{
+		//Sets Allow-Origin headers for this service.
+		if (session.response != null)
+		{
+			session.response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+		}
+		
 		//fetches the RTTI and execute the functions		
 		var c : Class<BaseService> = Type.getClass(this);		
 		var has_found : Bool = false; 		

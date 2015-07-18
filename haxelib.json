@@ -4,7 +4,7 @@
   "license": "MIT",
   "tags": ["nodejs","http","web","webservice","get","post"],
   "description": "nodejs HTTP Web Services",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "releasenote": "Web Services framework for nodejs",
   "contributors": ["eduardo-costa"]  
 }

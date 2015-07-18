@@ -10,4 +10,10 @@
 ## 0.2.0
 * Refactoring for using `hxnodejs` Haxe's nodejs bindings.
 
+## 0.3.0
+* Several Improvements
+
+## 0.4.0
+* Several Improvements :)
+
    
