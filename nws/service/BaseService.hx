@@ -89,7 +89,14 @@ class BaseService
 		//Sets Allow-Origin headers for this service.
 		if (session.response != null)
 		{
-			session.response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+			if (allowOrigin == "")
+			{				
+				session.response.removeHeader("Access-Control-Allow-Origin");
+			}
+			else
+			{
+				session.response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+			}
 		}
 		
 		//fetches the RTTI and execute the functions		
