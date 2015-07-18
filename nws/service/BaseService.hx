@@ -102,10 +102,15 @@ class BaseService
 		//fetches the RTTI and execute the functions		
 		var c : Class<BaseService> = Type.getClass(this);		
 		var has_found : Bool = false; 		
-		while (c != null)
-		{			
-			has_found = ExecuteRoutes(c) || has_found;
-			c = cast Type.getSuperClass(c);
+		var cl : Array<Class<BaseService>> = [];
+		while (c != null) { cl.push(c); c = cast Type.getSuperClass(c); }
+		cl.pop(); 	  //Removes BaseService because it has no routes
+		cl.reverse(); //Make it start in base classes and go up.
+		for (it in cl)
+		{
+			var execute_found : Bool = ExecuteRoutes(it);
+			has_found = execute_found || has_found;
+			//trace("Trying ["+Type.getClassName(it)+"]["+execute_found+"]");
 		}
 		
 		if (!has_found) 
@@ -113,7 +118,7 @@ class BaseService
 			Log(Type.getClassName(Type.getClass(this)) + "> Route not found.", 1);
 			var err : Error = new Error("Route ["+session.url.pathname+"] Not Found.");
 			err.name = "route_not_found";
-			OnError(err);
+			OnError(err);			
 		}
 		
 		//Call execution callback.
@@ -130,8 +135,10 @@ class BaseService
 		var c : Class<BaseService> = p_type;
 		var d : Array<Dynamic> = cast Meta.getFields(c);		
 		var has_found : Bool = false;
+		//trace(">> execute");
 		if (d != null)
-		{			
+		{		
+			//trace(">> metas");
 			var ref : Dynamic = this;			
 			var ms  : String = cast session.method;
 			ms = ms.toLowerCase();
@@ -143,20 +150,25 @@ class BaseService
 			//if has route metadata				
 			if (route != null)
 			{
+				//trace(">> route");
 				//has sufficient args
 				if (route.length > 1)
 				{
 					var ml : String = route[0];
 					ml = ml.toLowerCase();
 					
-					//http-method is supported by route				
+					//trace(">> method["+ms+"]["+ml+"]");
+					//http-method is supported by route
 					if (ml.indexOf(ms) >= 0)
 					{
 						var opt  : String = route.length >= 3 ? route[2] : "";
 						var rule : String = route[1];
-						var er : EReg = new EReg(rule, opt);							
+						var er : EReg = new EReg(rule, opt);
+						//trace(">> url["+(session.url!=null)+"]");
 						if (session.url != null)
 						{
+							//trace(er);
+							//trace(session.url.pathname);
 							if (er.match(session.url.pathname))
 							{
 								has_found = true;

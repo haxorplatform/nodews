@@ -165,8 +165,6 @@ class HttpApplication
 		method    = p_request.method;
 		multipart = false;
 		
-		
-		
 		try
 		{
 			url = Url.parse(p_request.url);
@@ -198,6 +196,7 @@ class HttpApplication
 				s.session.response   = response;
 				s.session.method     = method;
 				s.session.url        = url;
+				
 				
 				response.on("finish", function()
 				{
@@ -328,7 +327,7 @@ class HttpApplication
 	 */
 	private function OnConnection(p_socket : Socket):Void
 	{
-		Log("HTTP> OnConnection ip["+p_socket.remoteAddress+"]", 3);
+		Log("Http> OnConnection ip["+p_socket.remoteAddress+"]", 3);
 	}
 	
 	/**
@@ -358,6 +357,10 @@ class HttpApplication
 			if(service!=null) service.OnError(p_error);
 			for (i in 0...m_plugins.length) m_plugins[i].OnError(p_error);
 		}
+		
+		var ename : String = p_error == null ? "" : " [" + p_error.name+"]";
+		var emsg  : String = p_error == null ? "" : " [" + p_error.message+"]";		
+		Log("Http> Error" + ename+emsg + " code["+p_status_code+"]");
 	}
 	
 	/**

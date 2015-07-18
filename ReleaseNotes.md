@@ -16,4 +16,7 @@
 ## 0.4.0
 * Several Improvements :)
 
+## 0.5.0
+* Added Controller class for 'notification' standard communication
+
    
