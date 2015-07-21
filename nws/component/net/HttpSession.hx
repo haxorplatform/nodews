@@ -1,18 +1,26 @@
-package nws.service;
-import haxe.Timer;
+package nws.component.net;
 import js.node.Buffer;
 import js.node.http.IncomingMessage;
 import js.node.http.Method;
 import js.node.http.ServerResponse;
 import js.node.Url.UrlData;
 
+/**
+ * Class that describes the possible formats of a request data.
+ */
+extern class SessionData
+{
+	var text   : String;
+	var buffer : Buffer;
+	var json   : Dynamic;
+}
 
 /**
  * Class that contains the reference for HTTP information during the BaseService execution.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
 @:allow(nws)
-class ServiceSession
+class HttpSession
 {
 	/**
 	 * Current ServerResponse during a OnRequest event.
@@ -37,13 +45,10 @@ class ServiceSession
 	/**
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
 	 */
-	public var data : Dynamic;
+	public var data(get,never) : SessionData;
+	private function get_data():SessionData { return m_data; }
+	private var m_data : SessionData;
 	
-	/**
-	 * Request buffer. When appliable.
-	 */
-	public var buffer : Buffer;
-
 	/**
 	 * Flag that indicates if the incoming content is multipart/form
 	 */
@@ -101,8 +106,7 @@ class ServiceSession
 	public function new() 
 	{		
 		method = Method.Post;
-		buffer = new Buffer(0);
-		data   = { };
+		m_data = cast { };		
 		m_finished = false;
 	}
 	
