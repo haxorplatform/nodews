@@ -260,11 +260,11 @@ class HttpApplication
 				else
 				{
 					request.on(ReadableEvent.Data, function(p_data : EitherType<Buffer,String>):Void
-					{	
+					{									
 						try
 						{
 							if (Std.is(p_data, String))
-							{							
+							{	
 								data = Url.parse(cast p_data, true);
 							}
 							else
@@ -274,9 +274,9 @@ class HttpApplication
 								buffer = b;
 								try { data = Json.parse(b.toString()); } 
 								catch (err:Error) 
-								{									
-									data = b.toString();
-								}
+								{										
+									data = Querystring.parse(b.toString());
+								}								
 							}
 						}
 						catch (err:Error)
