@@ -16,6 +16,24 @@ extern class SessionData
 }
 
 /**
+ * Class that describes a cookie data.
+ */
+class CookieData
+{
+	/**
+	 * CTOR
+	 */
+	public function new():Void { }
+	
+	/**
+	 * Returns a flag that tells if a given key exists in the cookie.
+	 * @param	p_key
+	 * @return
+	 */
+	public function Contains(p_key:String):Bool { return untyped (this[p_key] != null); }
+}
+
+/**
  * Class that contains the reference for HTTP information during the BaseService execution.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
@@ -103,10 +121,10 @@ class HttpSession
 	/**
 	 * Returns an object filled with cookie informations.
 	 */
-	public var cookies(get, never) : Dynamic;
-	private function get_cookies():Dynamic
+	public var cookies(get, never) : CookieData;
+	private function get_cookies():CookieData
 	{
-		var c : Dynamic = { };
+		var c : CookieData = new CookieData();
 		var cs : String = untyped request.headers.cookies;		
 		if (cs == null) return c;					
 		var atrributes : Array<String> = cs.split("; ");			
@@ -114,8 +132,8 @@ class HttpSession
 		{			
 			var pair : Array<String> = a.split("=");
 			if (pair.length <= 0) continue;
-			var k : String = pair[0];
-			var v : String = pair[1]==null ? "" : pair[1];
+			var k : String  = pair[0];
+			var v : Dynamic = pair[1]==null ? {} : pair[1];
 			untyped c[k] = v;
 		} 		
 		return c;
