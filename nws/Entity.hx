@@ -68,6 +68,22 @@ class Entity extends Resource
 	}
 	
 	/**
+	 * Checks if the child exists and if not create a new one and returns it. 
+	 * @param	p_name
+	 * @param	p_component
+	 * @return
+	 */
+	public function AssertChild(p_name:String, p_component : Class<Component> = null):Resource
+	{
+		var e : Entity = GetChildByName(p_name);		
+		if (e == null) return CreateChild(p_name, p_component);
+		if (p_component == null) return e;
+		var c : Component = e.GetComponent(p_component);
+		if (c == null) c = e.AddComponent(p_component);
+		return c;
+	}
+	
+	/**
 	 * Adds a child entity in this instance.
 	 * @param	p_entity
 	 */
