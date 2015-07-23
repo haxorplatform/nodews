@@ -113,9 +113,9 @@ class HttpSession
 		for (a in atrributes) 
 		{			
 			var pair : Array<String> = a.split("=");
-			if (pair.length < 2) continue;
+			if (pair.length <= 0) continue;
 			var k : String = pair[0];
-			var v : String = pair[1];
+			var v : String = pair[1]==null ? "" : pair[1];
 			untyped c[k] = v;
 		} 		
 		return c;
