@@ -55,15 +55,15 @@ class Entity extends Resource
 	public function Contains(p_entity:Entity):Bool { return m_children.indexOf(p_entity) >= 0; }
 	
 	/**
-	 * Creates a new child entity with a name and adds the list of components in it.
+	 * Creates a new child entity with a name and adds the initial component into it. If a component is specified, the component is returned. Otherwise the Entity.
 	 * @param	p_name
-	 * @param	p_components
+	 * @param	p_component
 	 */
-	public function CreateChild(p_name:String, p_components : Array <Class<Component>>=null):Entity
-	{
-		var cl : Array<Class<Component>> = p_components == null ? [] : p_components;
+	public function CreateChild(p_name:String, p_component : Class<Component> = null):Resource
+	{		
 		var e : Entity = new Entity(p_name);
-		for (cc in cl) e.AddComponent(cc);
+		AddChild(e);
+		if(p_component != null) return e.AddComponent(p_component);
 		return e;
 	}
 	
