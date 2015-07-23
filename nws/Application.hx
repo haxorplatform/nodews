@@ -3,14 +3,14 @@ import js.Error;
 import js.Node;
 import js.node.Os;
 import js.node.Process.ProcessEvent;
-import nws.core.Controller;
+import nws.core.Entity;
 
 /**
  * Base class that describes a web application.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
 @:allow(nws)
-class Application extends Controller
+class Application extends Entity
 {
 	/**
 	 * Global reference to the application created.

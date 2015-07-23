@@ -14,7 +14,7 @@ import js.node.Url;
 import js.node.Url.UrlData;
 import nws.component.Component;
 import nws.component.net.HttpSession.SessionData;
-import nws.core.Controller;
+import nws.core.Entity;
 
 /**
  * Class that implements an Http server component.
@@ -264,8 +264,8 @@ class HttpComponent extends Component
 	@:noCompletion
 	private function TraverseInterfaces(p_callback : IHttpHandler->Void):Void
 	{		
-		var cb : Controller->Bool = 
-		function(e:Controller):Bool 
+		var cb : Entity->Bool = 
+		function(e:Entity):Bool 
 		{ 			
 			if (Std.is(e, IHttpHandler))
 			{
@@ -280,7 +280,7 @@ class HttpComponent extends Component
 			}
 			return true;
 		}		
-		controller.Traverse(cb);
+		entity.Traverse(cb);
 	}	
 	
 	/**

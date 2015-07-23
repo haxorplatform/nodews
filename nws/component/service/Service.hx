@@ -4,8 +4,8 @@ import nws.component.Component;
 import nws.component.net.HttpComponent;
 import nws.component.net.HttpSession;
 import nws.component.net.IHttpHandler;
-import nws.core.Controller;
-import nws.core.Entity.MetaData;
+import nws.core.Entity;
+import nws.core.Resource.MetaData;
 
 /**
  * Base class for web services that executes routed methods using the metadata "route(methods,regexp)"
@@ -46,7 +46,7 @@ class Service extends Component implements IHttpHandler
 	 * Flag that indicates if this Service is valid for execution.
 	 */
 	public var valid(get, never):Bool;
-	private function get_valid():Bool { return http != null; }
+	private function get_valid():Bool { return (http != null) && (!session.finished); }
 	
 	/**
 	 * Internal CTOR.
@@ -64,11 +64,11 @@ class Service extends Component implements IHttpHandler
 	 */
 	override public function OnCreate():Void 
 	{
-		Log("Create!", 4);
+		//Log("Create!", 4);
 	}
 	
 	/**
-	 * Callback called on a request arrives on a HttpComponent in this component hierarchy.
+	 * Callback called on a request arrives on a HttpComponent in this component's hierarchy.
 	 * @param	p_target
 	 */
 	public function OnRequest(p_target:HttpComponent):Void 
@@ -107,7 +107,8 @@ class Service extends Component implements IHttpHandler
 			if (route_rule.match(http.url.pathname))
 			{
 				has_found = true;
-				var validated : Bool = OnValidateMetadata(it, function()
+				var validated : Bool = 
+				OnValidateMetadata(it, function()
 				{ 
 					if(!session.finished) OnBeforeAction(route_data[1]);
 					if(!session.finished) untyped ref[it.field](); 				
@@ -135,7 +136,7 @@ class Service extends Component implements IHttpHandler
 		//If not persistent, kill this instance and add another of same type in the controller.
 		if (!persistent)
 		{
-			var e : Controller = controller;
+			var e : Entity = entity;
 			Destroy();
 			e.AddComponent(cast GetType());
 		}		

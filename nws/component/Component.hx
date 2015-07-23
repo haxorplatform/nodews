@@ -1,21 +1,21 @@
 package nws.component;
 import js.Error;
-import nws.core.Controller;
 import nws.core.Entity;
+import nws.core.Resource;
 
 /**
  * Base class that implements atomic features only related to their scope.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
 @:allow(nws)
-class Component extends Entity
+class Component extends Resource
 {
 	/**
 	 * Reference to the entity that owns this component.
 	 */
-	public var controller(get, never):Controller;
-	private function get_controller():Controller { return m_controller; }
-	private var m_controller : Controller;
+	public var entity(get, never):Entity;
+	private function get_entity():Entity { return m_entity; }
+	private var m_entity : Entity;
 	
 	/**
 	 * Flag that indicates this component is enabled and will execute its callbacks.
@@ -28,13 +28,13 @@ class Component extends Entity
 	/**
 	 * Reference to the running application.
 	 */
-	public var application(get, never):Application;
-	private function get_application():Application { return controller.application; }
+	public var app(get, never):Application;
+	private function get_app():Application { return entity.app; }
 	
 	/**
 	 * Returns this component's entity name.
 	 */	
-	override private function get_name():String { return controller.name; }
+	override private function get_name():String { return entity.name; }
 	
 	/**
 	 * Internal CTOR.
@@ -51,7 +51,7 @@ class Component extends Entity
 	 */
 	override public function Destroy():Void
 	{
-		m_controller.m_components.remove(this);
+		m_entity.m_components.remove(this);
 		super.Destroy();
 	}
 	
@@ -62,7 +62,7 @@ class Component extends Entity
 	 */
 	override public function Throw(p_error:Error,p_data:Dynamic=null):Void
 	{	
-		controller.Throw(p_error, p_data);
+		entity.Throw(p_error, p_data);
 	}
 	
 	/**
@@ -72,7 +72,7 @@ class Component extends Entity
 	 */
 	inline public function Log(p_message:Dynamic, p_level :Int = 0):Void
 	{
-		if (p_level <= application.verbose) untyped console.log(GetTypeName()+">",p_message);
+		if (p_level <= app.verbose) untyped console.log(GetTypeName()+">",p_message);
 	}
 	
 	/**

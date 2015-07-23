@@ -19,7 +19,7 @@ class NotificationService extends Service
 	private function get_notification():Notification
 	{
 		if (m_notification != null) return m_notification;
-		return m_notification = cast controller.AddComponent(Notification);
+		return m_notification = cast entity.AddComponent(Notification);
 	}
 	private var m_notification : Notification;
 	
@@ -76,7 +76,7 @@ class NotificationService extends Service
 		}
 		n.event = n.event == null ? "" : n.event;
 		n.data  = n.data == null ? { } : n.data;
-		controller.Notify(n.path, n.event, n.data);
+		entity.Notify(n.path, n.event, n.data);
 	}
 	
 	/**
