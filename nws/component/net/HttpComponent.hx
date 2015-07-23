@@ -175,6 +175,7 @@ class HttpComponent extends Component
 		
 		response.on("finish", function()
 		{			
+			Log("Response Finish ["+path+"]",3);
 			session.m_finished = true;
 			OnFinish();
 			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(this); } );			

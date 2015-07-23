@@ -55,8 +55,7 @@ class Service extends Controller implements IHttpHandler
 	 */
 	override private function new():Void
 	{
-		super();
-		route 		= new EReg("(.*?)", "");
+		super();		
 		allowOrigin = "*";		
 		persistent  = false;
 	}
@@ -75,24 +74,17 @@ class Service extends Controller implements IHttpHandler
 	 */
 	public function OnRequest(p_target:HttpComponent):Void 
 	{
-		if (!enabled) return;		
+		if (!enabled) return;
+		if (route == null) return;
 		m_http    = p_target;		
 		m_session = m_http.session;
 		if (!route.match(m_http.path))
 		{			
 			return;
-		}
+		}		
+		if (!valid) return;
 		
-		if (session.finished) return;
-		
-		if (allowOrigin == "")
-		{				
-			session.response.removeHeader("Access-Control-Allow-Origin");
-		}
-		else
-		{
-			session.response.setHeader("Access-Control-Allow-Origin", allowOrigin);
-		}
+		//Log("OnRequest ["+(untyped route.r)+"]",5);
 		
 		var md : Array<MetaData> = cast metadata;
 		var has_found : Bool  = false;
@@ -125,8 +117,25 @@ class Service extends Controller implements IHttpHandler
 				}
 			}			
 		}		
-		if (!has_found) OnRouteFail();		
-		http.found = true;
+		if (!has_found)
+		{
+			OnRouteFail();		
+		}
+		else
+		{
+			if (!session.response.headersSent)
+			{
+				if (allowOrigin == "")
+				{				
+					session.response.removeHeader("Access-Control-Allow-Origin");
+				}
+				else
+				{
+					session.response.setHeader("Access-Control-Allow-Origin", allowOrigin);
+				}
+			}
+		}
+		http.found = http.found || has_found;
 	}
 	
 	/**
@@ -134,13 +143,14 @@ class Service extends Controller implements IHttpHandler
 	 * @param	p_target
 	 */
 	public function OnFinish(p_target:HttpComponent):Void 
-	{		
+	{	
 		//If not persistent, kill this instance and add another of same type in the controller.
+		Log(">>>>> " + persistent);
 		if (!persistent)
 		{
-			var e : Entity = entity;
-			Destroy();
-			e.AddComponent(cast GetType());
+			//var e : Entity = entity;
+			//Destroy();
+			//e.AddComponent(cast GetType());
 		}		
 		m_http = null;
 	}
