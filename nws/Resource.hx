@@ -1,4 +1,4 @@
-package nws.core;
+package nws;
 import haxe.rtti.Meta;
 import js.Error;
 import nws.component.Component;

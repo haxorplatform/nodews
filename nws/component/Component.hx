@@ -1,7 +1,7 @@
 package nws.component;
 import js.Error;
-import nws.core.Entity;
-import nws.core.Resource;
+import nws.Entity;
+import nws.Resource;
 
 /**
  * Base class that implements atomic features only related to their scope.

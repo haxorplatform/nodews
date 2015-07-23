@@ -1,4 +1,4 @@
-package nws.core;
+package nws;
 import js.Error;
 import nws.component.Component;
 

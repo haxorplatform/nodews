@@ -14,7 +14,7 @@ import js.node.Url;
 import js.node.Url.UrlData;
 import nws.component.Component;
 import nws.component.net.HttpSession.SessionData;
-import nws.core.Entity;
+import nws.Entity;
 
 /**
  * Class that implements an Http server component.

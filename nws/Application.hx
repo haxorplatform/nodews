@@ -3,7 +3,17 @@ import js.Error;
 import js.Node;
 import js.node.Os;
 import js.node.Process.ProcessEvent;
-import nws.core.Entity;
+import nws.Entity;
+
+/**
+ * Base class for MVC applications. The root MVC instances must be informed.
+ */
+class ApplicationMVC<M,V,C> extends Application
+{
+	public var model      : M;
+	public var view       : V;
+	public var controller : C;
+}
 
 /**
  * Base class that describes a web application.

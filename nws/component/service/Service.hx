@@ -1,11 +1,12 @@
 package nws.component.service;
+import nws.Resource;
 import js.Error;
 import nws.component.Component;
 import nws.component.net.HttpComponent;
 import nws.component.net.HttpSession;
 import nws.component.net.IHttpHandler;
-import nws.core.Entity;
-import nws.core.Resource.MetaData;
+import nws.Entity;
+import nws.Resource.MetaData;
 
 /**
  * Base class for web services that executes routed methods using the metadata "route(methods,regexp)"
