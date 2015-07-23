@@ -140,7 +140,7 @@ class HttpComponent extends Component
 	 */
 	private function ConnectionHandler(p_socket:Socket):Void
 	{
-		Log("OnConnection ip[" + p_socket.remoteAddress + "]", 3);
+		Log("OnConnection ip[" + p_socket.remoteAddress + "]", 5);
 		OnConnection(p_socket);
 	}
 	
@@ -175,7 +175,7 @@ class HttpComponent extends Component
 		
 		response.on("finish", function()
 		{			
-			Log("Response Finish ["+path+"]",3);
+			Log("Response Finish ["+path+"]",5);
 			session.m_finished = true;
 			OnFinish();
 			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(this); } );			
