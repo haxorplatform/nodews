@@ -51,6 +51,13 @@ class Service extends Controller implements IHttpHandler
 	private function get_valid():Bool { return (http != null) && (!session.finished); }
 	
 	/**
+	 * Flag that indicates this service executed 1 or more routes.
+	 */
+	public var found(get, never):Bool;
+	private function get_found():Bool { return m_found; }
+	private var m_found : Bool;
+	
+	/**
 	 * Internal CTOR.
 	 */
 	override private function new():Void
@@ -58,6 +65,7 @@ class Service extends Controller implements IHttpHandler
 		super();		
 		allowOrigin = "*";		
 		persistent  = false;
+		m_found		= false;
 	}
 	
 	/**
@@ -116,7 +124,10 @@ class Service extends Controller implements IHttpHandler
 					if(!session.finished) OnAfterAction(route_data[1]);							
 				}
 			}			
-		}		
+		}	
+		
+		m_found = has_found;
+		
 		if (!has_found)
 		{
 			OnRouteFail();		
@@ -145,6 +156,7 @@ class Service extends Controller implements IHttpHandler
 	public function OnFinish(p_target:HttpComponent):Void 
 	{	
 		//If not persistent, kill this instance and add another of same type in the controller.		
+		if(found)
 		if (!persistent)
 		{
 			var e : Entity = entity;
