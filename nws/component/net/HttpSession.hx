@@ -101,6 +101,27 @@ class HttpSession
 	}
 	
 	/**
+	 * Returns an object filled with cookie informations.
+	 */
+	public var cookies(get, never) : Dynamic;
+	private function get_cookies():Dynamic
+	{
+		var c : Dynamic = { };
+		var cs : String = untyped request.headers.cookies;		
+		if (cs == null) return c;					
+		var atrributes : Array<String> = cs.split("; ");			
+		for (a in atrributes) 
+		{			
+			var pair : Array<String> = a.split("=");
+			if (pair.length < 2) continue;
+			var k : String = pair[0];
+			var v : String = pair[1];
+			untyped c[k] = v;
+		} 		
+		return c;
+	}
+	
+	/**
 	 * Creates the service session.
 	 */
 	public function new() 
