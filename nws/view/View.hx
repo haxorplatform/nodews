@@ -1,4 +1,4 @@
-package nws.controller;
+package nws.view;
 import nws.component.Component;
 
 /**
