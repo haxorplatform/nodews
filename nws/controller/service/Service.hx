@@ -144,13 +144,12 @@ class Service extends Controller implements IHttpHandler
 	 */
 	public function OnFinish(p_target:HttpComponent):Void 
 	{	
-		//If not persistent, kill this instance and add another of same type in the controller.
-		Log(">>>>> " + persistent);
+		//If not persistent, kill this instance and add another of same type in the controller.		
 		if (!persistent)
 		{
-			//var e : Entity = entity;
-			//Destroy();
-			//e.AddComponent(cast GetType());
+			var e : Entity = entity;
+			Destroy();
+			e.AddComponent(cast GetType());
 		}		
 		m_http = null;
 	}
