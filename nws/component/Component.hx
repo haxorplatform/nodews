@@ -81,6 +81,11 @@ class Component extends Resource
 	public function OnCreate():Void { }
 	
 	/**
+	 * Callback called milisseconds after create allowing the app to have all references set.
+	 */
+	public function OnInitialize():Void {}
+	
+	/**
 	 * Callback called when a notification is issued in the controller or controller's hierarchy.
 	 * @param	p_path
 	 * @param	p_event

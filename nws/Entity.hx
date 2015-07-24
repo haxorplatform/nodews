@@ -1,5 +1,6 @@
 package nws;
 import js.Error;
+import js.Node;
 import nws.component.Component;
 
 /**
@@ -159,6 +160,7 @@ class Entity extends Resource
 		var c : Component = Type.createInstance(p_type,[]);
 		c.m_entity = this;
 		c.OnCreate();
+		Node.setTimeout(function() { c.OnInitialize(); }, 8);
 		m_components.push(c);
 		return c;
 	}
