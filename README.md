@@ -3,7 +3,9 @@
 
 ### Overview
 
-NodeWS is a MVC based architecture for developing back-end services of different kinds.
+NodeWS is a Entity-Component based architecture for developing back-end services of different kinds.
+Also it offers MVC features as Components.
+
 
 ### Installation
 

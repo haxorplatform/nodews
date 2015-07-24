@@ -19,4 +19,7 @@
 ## 0.5.0
 * Added Controller class for 'notification' standard communication
 
+## 1.0.0
+* Full code refactor. NodeWS adapted to Application-Entity-Component pattern with MVC features.
+
    
