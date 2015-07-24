@@ -163,8 +163,7 @@ class Service extends Controller implements IHttpHandler
 			var e : Entity = entity;
 			Destroy();
 			e.AddComponent(cast GetType());
-		}		
-		m_http = null;
+		}
 	}
 	
 	/**
