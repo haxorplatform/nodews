@@ -173,7 +173,7 @@ class Service extends Controller implements IHttpHandler
 	 */
 	override public function Throw(p_error:Error, p_data:Dynamic = null):Void 
 	{		
-		http.Throw(p_error, p_data);
+		app.Throw(p_error, p_data);
 	}
 	
 	/**
@@ -183,7 +183,7 @@ class Service extends Controller implements IHttpHandler
 	 */
 	override public function OnError(p_error:Error, p_data:Dynamic):Void 
 	{
-		session.m_finished = true;
+		if(session!=null)session.m_finished = true;
 	}
 	
 	/**
