@@ -18,7 +18,7 @@ extern class SessionData
 /**
  * Class that describes a cookie data.
  */
-class CookieData
+class CookieData implements Dynamic<Dynamic>
 {
 	/**
 	 * CTOR
@@ -125,12 +125,12 @@ class HttpSession
 	private function get_cookies():CookieData
 	{
 		var c : CookieData = new CookieData();
-		var cs : String = untyped request.headers.cookies;		
+		var cs : String = untyped request.headers.cookie;
 		if (cs == null) return c;					
-		var atrributes : Array<String> = cs.split("; ");			
-		for (a in atrributes) 
+		var attribs : Array<String> = cs.split(";");			
+		for (a in attribs) 
 		{			
-			var pair : Array<String> = a.split("=");
+			var pair : Array<String> = StringTools.trim(a).split("=");
 			if (pair.length <= 0) continue;
 			var k : String  = pair[0];
 			var v : Dynamic = pair[1]==null ? {} : pair[1];
