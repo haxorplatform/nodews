@@ -102,6 +102,7 @@ class Service extends Controller implements IHttpHandler
 			var route_data:Array<Dynamic> = it.data.route;			
 			if (route_data == null) continue;			
 			if (route_data.length <= 1) continue;
+			if (!valid) continue;
 			var route_methods : String = route_data[0];
 			var method 		  : String = (cast http.request.method).toLowerCase();			
 			if (route_methods.indexOf(method) < 0) continue;
