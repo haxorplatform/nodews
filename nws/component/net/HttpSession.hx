@@ -34,6 +34,36 @@ class CookieData implements Dynamic<Dynamic>
 }
 
 /**
+ * Object that contains some of the header information of a request.
+ */
+class HeaderData implements Dynamic<Dynamic>
+{
+	public var host 		: String;
+    public var connection 	: String;
+    public var user_agent 	: String;
+	public var origin 		: String;
+	public var accept 		: String;
+	public var dnt 			: String;
+	public var referer 		: String;
+	public var accept_encoding 	: String;
+	public var accept_language 	: String;
+	public var content_length 	: Int;
+	public var cookie 			: String;
+	
+	/**
+	 * CTOR
+	 */
+	public function new():Void { }
+	
+	/**
+	 * Returns a flag that tells if a given key exists in the headers.
+	 * @param	p_key
+	 * @return
+	 */
+	public function Contains(p_key:String):Bool { p_key = StringTools.replace(p_key, "-", "_").toLowerCase(); return untyped (this[p_key] != null); }
+}
+
+/**
  * Class that contains the reference for HTTP information during the BaseService execution.
  * @author Eduardo Pons - eduardo@thelaborat.org
  */
@@ -125,6 +155,7 @@ class HttpSession
 	private function get_cookies():CookieData
 	{
 		var c : CookieData = new CookieData();
+		if (request == null) return c;
 		var cs : String = untyped request.headers.cookie;
 		if (cs == null) return c;					
 		var attribs : Array<String> = cs.split(";");			
@@ -137,6 +168,28 @@ class HttpSession
 			untyped c[k] = v;
 		} 		
 		return c;
+	}
+		
+	/**
+	 * Returns an object with some of returned header data.
+	 */
+	public var headers(get, never) : HeaderData;
+	private function get_headers():HeaderData
+	{
+		var c : HeaderData = new HeaderData();
+		if (request == null) return c;
+		var kl : Array<String> = request.headers.keys();		
+		for (k in kl)
+		{
+			k = StringTools.replace(k, "-", "_").toLowerCase();
+			var v : Dynamic = request.headers.get(k);
+			switch(k)
+			{
+				case "content_length": v = v == null ? 0 : Std.parseInt(v);
+			}
+			untyped c[k] = v;
+		}
+		return c;		
 	}
 	
 	/**

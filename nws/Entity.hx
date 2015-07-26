@@ -235,6 +235,7 @@ class Entity extends Resource
 		for (e in m_children) e.Notify(p_path, p_event, p_data);
 	}
 	
+	
 	/**
 	 * Destroy this instance.
 	 */
