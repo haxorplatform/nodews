@@ -183,7 +183,7 @@ class Service extends Controller implements IHttpHandler
 	 */
 	override public function OnError(p_error:Error, p_data:Dynamic):Void 
 	{
-		if(session!=null)session.m_finished = true;
+		
 	}
 	
 	/**

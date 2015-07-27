@@ -171,12 +171,13 @@ class HttpComponent extends Component
 		session.method 	   = p_request.method;
 		session.request    = p_request;
 		session.response   = p_response;
-		session.m_finished = false;
+		
+		untyped p_response.__id__ = Math.floor(Math.random() * 0xffffff) + "";
+		untyped p_request.__id__ = p_response.__id__;
 		
 		response.on("finish", function()
 		{			
-			Log("Response Finish ["+path+"]",5);
-			session.m_finished = true;
+			Log("Response Finish ["+path+"]",5);			
 			OnFinish();
 			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(this); } );			
 			response.removeAllListeners();

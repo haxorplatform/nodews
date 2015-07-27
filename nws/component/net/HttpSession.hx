@@ -133,8 +133,8 @@ class HttpSession
 	 * Flag that indicates the response was sent to client.
 	 */
 	public var finished(get, never):Bool;
-	private function get_finished():Bool { return m_finished; }
-	private var m_finished : Bool;
+	private function get_finished():Bool { var r : ServerResponse = response;  return untyped (r==null ? false : r.finished); }
+	
 	
 	/**
 	 * Flag that indicates if the session is still valid and usable.
@@ -144,7 +144,7 @@ class HttpSession
 	{
 		if (request == null) return false;
 		if (response == null) return false;		
-		if (m_finished) return false;
+		if (finished) return false;
 		return true;
 	}
 	
@@ -198,8 +198,7 @@ class HttpSession
 	public function new() 
 	{		
 		method = Method.Post;
-		m_data = cast { };		
-		m_finished = false;
+		m_data = cast { };				
 	}
 	
 	
