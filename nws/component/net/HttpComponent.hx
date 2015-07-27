@@ -250,8 +250,11 @@ class HttpComponent extends Component
 	 */
 	private function RequestParsed():Void
 	{
-		Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
-		session.m_data = data;
+		if (!session.multipart)
+		{
+			Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
+			session.m_data = data;
+		}
 		OnRequestParse();
 		TraverseInterfaces(function(n:IHttpHandler):Void { n.OnRequest(this); } );
 		if (!found)
