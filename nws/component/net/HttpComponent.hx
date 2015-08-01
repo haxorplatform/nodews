@@ -175,15 +175,18 @@ class HttpComponent extends Component
 		untyped p_response.__id__ = Math.floor(Math.random() * 0xffffff) + "";
 		untyped p_request.__id__ = p_response.__id__;
 		
-		response.on("finish", function()
+		var on_finish : Void->Void = null;
+		on_finish = function()
 		{			
 			Log("Response Finish ["+path+"]",5);			
-			OnFinish();
+			OnFinish(response);
 			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(this); } );			
-			response.removeAllListeners();
-		});
+			response.removeListener("finish", on_finish);
+		};
 		
-		Log("OnRequest method[" + request.method + "] url[" + request.url + "]", 1);			
+		response.on("finish",on_finish);
+		
+		Log("OnRequest method[" + request.method + "] url[" + request.url + "] id["+(untyped p_response.__id__)+"]", 1);			
 		data = cast { };
 		switch(request.method)
 		{
@@ -255,6 +258,12 @@ class HttpComponent extends Component
 			Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
 			session.m_data = data;
 		}
+		else
+		{
+			session.m_data = cast { };
+			session.m_data.text = "";
+			session.m_data.json = {};
+		}
 		OnRequestParse();
 		TraverseInterfaces(function(n:IHttpHandler):Void { n.OnRequest(this); } );
 		if (!found)
@@ -291,7 +300,7 @@ class HttpComponent extends Component
 	/**
 	 * Callback called when the current request has finished.
 	 */
-	public function OnFinish():Void { }
+	public function OnFinish(p_response:ServerResponse):Void { }
 	
 	/**
 	 * Callback called upon connection.
