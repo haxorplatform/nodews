@@ -31,6 +31,12 @@ class Component extends Resource
 	public var app(get, never):Application;
 	private function get_app():Application { return entity.app; }
 	
+	
+	/**
+	 * Flag that indicates if this component will emit log messages.
+	 */
+	public var log : Bool;
+	
 	/**
 	 * Returns this component's entity name.
 	 */	
@@ -42,6 +48,7 @@ class Component extends Resource
 	private function new()
 	{
 		super("");
+		log = true;
 		m_enabled = true;
 	}
 	
@@ -72,7 +79,7 @@ class Component extends Resource
 	 */
 	inline public function Log(p_message:Dynamic, p_level :Int = 0):Void
 	{
-		if (p_level <= app.verbose) untyped console.log(GetTypeName()+">",p_message);
+		if(log)if (p_level <= app.verbose) untyped console.log(GetTypeName()+">",p_message);
 	}
 	
 	/**
