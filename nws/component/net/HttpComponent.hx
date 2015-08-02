@@ -237,7 +237,7 @@ class HttpComponent extends Component
 					
 					request.on(ReadableEvent.End, function():Void
 					{					
-						RequestParsed();						
+						RequestParsed();
 					});		
 				}
 			
@@ -255,7 +255,7 @@ class HttpComponent extends Component
 	{
 		if (!session.multipart)
 		{
-			Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
+			//Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
 			session.m_data = data;
 		}
 		else
