@@ -148,15 +148,6 @@ class Service extends Controller implements IHttpHandler
 			}
 		}
 		
-		//If not persistent, kill this instance and add another of same type in the controller.		
-		if(found)
-		if (!persistent)
-		{
-			var e : Entity = entity;
-			Destroy();
-			e.AddComponent(cast GetType());
-		}
-		
 		http.found = http.found || has_found;
 	}
 	
@@ -166,7 +157,14 @@ class Service extends Controller implements IHttpHandler
 	 */
 	public function OnFinish(p_target:HttpComponent):Void 
 	{	
-		
+		//If not persistent, kill this instance and add another of same type in the controller.		
+		if(found)
+		if (!persistent)
+		{
+			var e : Entity = entity;
+			Destroy();
+			e.AddComponent(cast GetType());
+		}
 	}
 	
 	/**
