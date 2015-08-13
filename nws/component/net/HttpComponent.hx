@@ -208,6 +208,7 @@ class HttpComponent extends Component
 					{	
 						try
 						{
+							
 							if (Std.is(p_data, String))
 							{				
 								data.text = p_data;
@@ -217,14 +218,13 @@ class HttpComponent extends Component
 							if (Std.is(p_data, Buffer))
 							{
 								var b : Buffer = cast p_data;
-								data.buffer = b;
-								data.text   = b.toString();
-								
-								try { data.json = Json.parse(data.text); } 
-								catch (err:Error) 
-								{									
-									data.json = Url.parse(data.text, true);
-								}
+								if (data.buffer == null) data.buffer = b;
+								else
+								{
+									var b0 : Buffer = data.buffer;
+									var b1 : Buffer = b;
+									data.buffer = Buffer.concat([b0, b1]);									
+								}								
 							}
 						}
 						catch (err:Error)
@@ -236,7 +236,13 @@ class HttpComponent extends Component
 					});
 					
 					request.on(ReadableEvent.End, function():Void
-					{					
+					{			
+						data.text   = data.buffer.toString();
+						try { data.json = Json.parse(data.text); } 
+						catch (err:Error) 
+						{									
+							data.json = Url.parse(data.text, true);
+						}
 						RequestParsed();
 					});		
 				}
