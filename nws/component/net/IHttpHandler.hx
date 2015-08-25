@@ -14,11 +14,11 @@ interface IHttpHandler
 	 * @param	p_request
 	 * @param	p_response
 	 */
-	function OnRequest(p_target:HttpComponent):Void;
+	function OnRequest(p_session:HttpSession):Void;
 	
 	/**
 	 * Callback called when the request has finished.
 	 * @param	p_http
 	 */
-	function OnFinish(p_target:HttpComponent):Void;
+	function OnFinish(p_session:HttpSession):Void;
 }

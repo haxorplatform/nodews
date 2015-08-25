@@ -33,17 +33,17 @@ class HttpComponent extends Component
 	/**
 	 * Reference for the currently active request.
 	 */
-	private var request : IncomingMessage;
+	//private var request : IncomingMessage;
 	
 	/**
 	 * Reference for the currently active request.
 	 */
-	private var response : ServerResponse;
+	//private var response : ServerResponse;
 	
 	/**
 	 * Reference to the current executing session scope.
 	 */
-	private var session:HttpSession;
+	//private var session:HttpSession;
 	
 	/**
 	 * Reference for this component's server.
@@ -61,22 +61,22 @@ class HttpComponent extends Component
 	/**
 	 * URL Data incoming from the request.
 	 */
-	public var url : UrlData;
+	//public var url : UrlData;
 	
 	/**
 	 * Current request path.
 	 */
-	public var path : String;
+	//public var path : String;
 	
 	/**
 	 * Container of the incoming request data in different formats.
 	 */
-	public var data : SessionData;
+	//public var data : SessionData;
 	
 	/**
 	 * Flag that indicates a Http handler was found and executed successfully.
 	 */
-	public var found : Bool;
+	//public var found : Bool;
 	
 	/**
 	 * Creates a HttpServer and start listening.
@@ -108,11 +108,11 @@ class HttpComponent extends Component
 	 * Aborts the current request.
 	 * @param	p_code
 	 */
-	public function Abort(p_code:Int = 500):Void
+	public function Abort(p_code:Int = 500,p_path:String=""):Void
 	{				
 		var err :Error = new Error();
 		err.name    = "http-abort";		
-		err.message = "Request request[" + path + "] aborted code[" + p_code+"]";
+		err.message = "Request request[" + p_path + "] aborted code[" + p_code+"]";
 		Throw(err, p_code);
 	}
 	
@@ -125,12 +125,14 @@ class HttpComponent extends Component
 	{	
 		if (p_error != null)
 		{
-			Log("[error] name["+p_error.name+"] msg["+p_error.message+"]");
+			Log("[error] name[" + p_error.name+"] msg[" + p_error.message+"]");
+			/*
 			if (response != null)
 			{
 				response.statusCode = (p_error.name == "http-abort") ? p_data : 500;
 				response.end();
-			}			
+			}
+			//*/
 		}
 	}
 	
@@ -150,80 +152,92 @@ class HttpComponent extends Component
 	 */
 	private function RequestHandler(p_request:IncomingMessage, p_response:ServerResponse):Void
 	{		
-		found = false;
-		OnRequest(p_request, p_response);
-		request   = p_request;
-		response  = p_response;		
+		var req : IncomingMessage = p_request;
+		var res : ServerResponse  = p_response;
 		
+		OnRequest(req, res);
+				
+		
+		var s : HttpSession = new HttpSession();
+				
 		try
 		{
-			url = Url.parse(p_request.url);
+			s.url = Url.parse(req.url);
 		}
 		catch (err:Error)
 		{
 			Log("[error] ["+err.name+"]["+err.message+"]");			
-			url = cast { pathname:"" };
+			s.url = cast { pathname:"" };
 		}
+				
+		s.http		 = this;
+		s.request    = req;
+		s.response   = res;
 		
-		path = url.pathname;
-		
-		session = new HttpSession();
-		session.method 	   = p_request.method;
-		session.request    = p_request;
-		session.response   = p_response;
-		
-		untyped p_response.__id__ = Math.floor(Math.random() * 0xffffff) + "";
-		untyped p_request.__id__ = p_response.__id__;
+		untyped res.__id__  = Math.floor(Math.random() * 0xffffff) + "";
+		untyped req.__id__  = res.__id__;
 		
 		var on_finish : Void->Void = null;
 		on_finish = function()
 		{			
-			Log("Response Finish ["+path+"]",5);			
-			OnFinish(response);
-			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(this); } );			
-			response.removeListener("finish", on_finish);
-		};
+			Log("Response Finish ["+s.path+"]",5);			
+			OnFinish(res);
+			TraverseInterfaces(function(n:IHttpHandler):Void { n.OnFinish(s); } );			
+			res.removeListener("finish", on_finish);
+		};		
+		res.on("finish",on_finish);
 		
-		response.on("finish",on_finish);
+		ProcessSession(s);
 		
-		Log("OnRequest method[" + request.method + "] url[" + request.url + "] id["+(untyped p_response.__id__)+"]", 1);			
-		data = cast { };
-		switch(request.method)
+	}
+	
+	/**
+	 * Process the session that arrived.
+	 * @param	p_session
+	 */
+	private function ProcessSession(p_session:HttpSession):Void
+	{
+		var s   : HttpSession 	  = p_session;
+		var req : IncomingMessage = s.request;
+		var res : ServerResponse  = s.response;
+		Log("OnRequest method[" + req.method + "] url[" + req.url + "] id["+(untyped res.__id__)+"]", 1);			
+		var d : SessionData = s.data = cast { };
+		switch(req.method)
 		{
 			case Method.Get:				
-				data.text = url.query==null ? "" : url.query;
-				data.json = data.text == "" ? { } : Querystring.parse(data.text);				
-				RequestParsed();
+				d.text = s.url.query==null ? "" : s.url.query;
+				d.json = d.text == "" ? { } : Querystring.parse(d.text);				
+				RequestParsed(s);
 				
 			case Method.Post:
 				
 				//If request has multipart content, let the user handle it with his module of choice.
-				if (session.multipart)
+				if (s.multipart)
 				{
-					RequestParsed();
+					RequestParsed(s);
 				}
 				else
 				{
-					request.on(ReadableEvent.Data, function(p_data : haxe.extern.EitherType<Buffer,String>):Void
+					req.on(ReadableEvent.Data, function(p_data : haxe.extern.EitherType<Buffer,String>):Void
 					{	
 						try
 						{
 							
 							if (Std.is(p_data, String))
 							{				
-								data.text = p_data;
-								data.json = Url.parse(cast p_data, true);								
+								d.text = p_data;
+								d.json = Url.parse(cast p_data, true);								
 							}
 							else
 							if (Std.is(p_data, Buffer))
 							{
 								var b : Buffer = cast p_data;
-								if (data.buffer == null) data.buffer = b;
+								if (d.buffer == null) d.buffer = b;
 								else
 								{
-									var b0 : Buffer = data.buffer;
+									var b0 : Buffer = d.buffer;
 									var b1 : Buffer = b;
-									data.buffer = Buffer.concat([b0, b1]);									
+									d.buffer = Buffer.concat([b0, b1]);									
 								}								
 							}
 						}
@@ -235,49 +249,50 @@ class HttpComponent extends Component
 						}
 					});
 					
-					request.on(ReadableEvent.End, function():Void
+					req.on(ReadableEvent.End, function():Void
 					{			
-						data.text   = data.buffer.toString();
-						try { data.json = Json.parse(data.text); } 
+						d.text   = d.buffer.toString();
+						try { d.json = Json.parse(d.text); } 
 						catch (err:Error) 
 						{									
-							data.json = Url.parse(data.text, true);
+							d.json = Url.parse(d.text, true);
 						}
-						RequestParsed();
+						RequestParsed(s);
 					});		
 				}
 			
 			default:	
-				data.text = url.query==null ? "" : url.query;
-				data.json = data.text=="" ? {} : Querystring.parse(data.text);	
-				RequestParsed();
+				d.text = s.url.query==null ? "" : s.url.query;
+				d.json = d.text=="" ? {} : Querystring.parse(d.text);	
+				RequestParsed(s);
 		}
 	}
 	
 	/**
 	 * Followup after the request's data is parsed.
 	 */
-	private function RequestParsed():Void
+	private function RequestParsed(p_session:HttpSession):Void
 	{
-		if (!session.multipart)
+		var s : HttpSession = p_session;
+		if (!s.multipart)
 		{
 			//Log("Request Parsed text[" + data.text.substr(0, 20) + "...]", 5);
-			session.m_data = data;
+			//s.m_data = data;
 		}
 		else
 		{
-			session.m_data = cast { };
-			session.m_data.text = "";
-			session.m_data.json = {};
+			//s.m_data = cast { };
+			//s.m_data.text = "";
+			//s.m_data.json = {};
 		}
 		OnRequestParse();
-		TraverseInterfaces(function(n:IHttpHandler):Void { n.OnRequest(this); } );
-		if (!found)
+		TraverseInterfaces(function(n:IHttpHandler):Void { n.OnRequest(s); } );		
+		if (!s.found)
 		{
 			//There is no service available
-			Log("No service found path[" + path + "].", 3);
-			response.statusCode = 400;
-			response.end();
+			Log("No service found path[" + s.path + "].", 3);
+			s.response.statusCode = 400;
+			s.response.end();
 		}
 	}
 	

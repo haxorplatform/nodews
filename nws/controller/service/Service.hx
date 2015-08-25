@@ -29,14 +29,7 @@ class Service extends Controller implements IHttpHandler
 	 * Origins allowed for this service.
 	 */
 	public var allowOrigin : String;
-	
-	/**
-	 * Reference to the currently active HttpComponent.
-	 */
-	public var http(get, never):HttpComponent;
-	private function get_http():HttpComponent { return m_http; }
-	private var m_http:HttpComponent;
-	
+		
 	/**
 	 * Reference to the session which spawned this service.
 	 */
@@ -48,7 +41,7 @@ class Service extends Controller implements IHttpHandler
 	 * Flag that indicates if this Service is valid for execution.
 	 */
 	public var valid(get, never):Bool;
-	private function get_valid():Bool { return (http != null) && (!session.finished); }
+	private function get_valid():Bool { return (session.http != null) && (!session.finished); }
 	
 	/**
 	 * Flag that indicates this service executed 1 or more routes.
@@ -81,17 +74,21 @@ class Service extends Controller implements IHttpHandler
 	 * Callback called on a request arrives on a HttpComponent in this component's hierarchy.
 	 * @param	p_target
 	 */
-	public function OnRequest(p_target:HttpComponent):Void 
+	public function OnRequest(p_session:HttpSession):Void 
 	{
-		if (!enabled) return;
-		if (route == null) return;
-		m_http    = p_target;		
-		m_session = m_http.session;
-		if (!route.match(m_http.path))
-		{			
+		if (!enabled)      return;
+		if (route == null) { Log("Service with null route!"); return; }
+		m_session = p_session;
+		if (!route.match(m_session.path))
+		{	
+			
 			return;
 		}		
-		if (!valid) return;
+		if (!valid)
+		{
+			Log("Service not valid. Returning");			
+			return;
+		}
 		
 		//Log("OnRequest ["+(untyped route.r)+"]",5);
 		
@@ -105,10 +102,10 @@ class Service extends Controller implements IHttpHandler
 			if (route_data.length <= 1) continue;
 			if (!valid) continue;
 			var route_methods : String = route_data[0];
-			var method 		  : String = (cast http.request.method).toLowerCase();			
+			var method 		  : String = (cast session.request.method).toLowerCase();			
 			if (route_methods.indexOf(method) < 0) continue;
 			var route_rule	  : EReg = new EReg(route_data[1],route_data.length<=2 ? "" : route_data[2]);
-			if (route_rule.match(http.url.pathname))
+			if (route_rule.match(session.url.pathname))
 			{
 				has_found = true;
 				var validated : Bool = 
@@ -149,17 +146,18 @@ class Service extends Controller implements IHttpHandler
 			}
 		}
 		
-		http.found = http.found || has_found;
+		session.found = session.found || has_found;
 	}
 	
 	/**
 	 * Callback called on a request is finished on a HttpComponent in this component hierarchy.
 	 * @param	p_target
 	 */
-	public function OnFinish(p_target:HttpComponent):Void 
+	public function OnFinish(p_session : HttpSession):Void 
 	{	
+		var s : HttpSession = p_session;
 		//If not persistent, kill this instance and add another of same type in the controller.		
-		if(found)
+		if(s.found)
 		if (!persistent)
 		{
 			var e : Entity = entity;

@@ -83,7 +83,8 @@ class HttpSession
 	/**
 	 * Request method.
 	 */
-	public var method : Method;
+	public var method(get, never) : Method;
+	private function get_method():Method { return (request == null) ? Method.Get : request.method; }
 	
 	/**
 	 * URLData generated during the OnRequest event.
@@ -91,11 +92,20 @@ class HttpSession
 	public var url : UrlData;
 	
 	/**
+	 * Reference to the server.
+	 */
+	public var http : HttpComponent;
+	
+	/**
+	 * Returns the path of the session.
+	 */
+	public var path(get, never):String;
+	private function get_path():String { return url.pathname; }
+	
+	/**
 	 * Parsed data generated during a request. The user don't need to handle the data manually.
 	 */
-	public var data(get,never) : SessionData;
-	private function get_data():SessionData { return m_data; }
-	private var m_data : SessionData;
+	public var data : SessionData;
 	
 	/**
 	 * Flag that indicates if the incoming content is multipart/form
@@ -149,6 +159,11 @@ class HttpSession
 	}
 	
 	/**
+	 * Flag that indicates a route was found.
+	 */
+	public var found : Bool;
+	
+	/**
 	 * Returns an object filled with cookie informations.
 	 */
 	public var cookies(get, never) : CookieData;
@@ -196,9 +211,18 @@ class HttpSession
 	 * Creates the service session.
 	 */
 	public function new() 
-	{		
-		method = Method.Post;
-		m_data = cast { };				
+	{	
+		data   = cast { };				
+		found  = false;
+	}
+	
+	/**
+	 * Aborts the session.
+	 * @param	p_code
+	 */
+	public function Abort(p_code:Int = 500):Void
+	{
+		http.Abort(p_code, path);
 	}
 	
 	
