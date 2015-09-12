@@ -71,7 +71,7 @@ class Application extends Entity
 	public function HasModule(p_module:String):Bool
 	{
 		var exists : Bool = true;		
-		try { Node.require_resolve(p_module); }
+		try { Node.require(p_module); }
 		catch (err:Error) { exists = false; }
 		return exists;		
 	}
