@@ -3,6 +3,7 @@ import js.Error;
 import js.Node;
 import js.node.Os;
 import js.node.Process.ProcessEvent;
+import js.RegExp;
 import nws.Entity;
 
 /**
@@ -37,6 +38,12 @@ class Application extends Entity
 	 */
 	public var host(get, never):String;
 	private function get_host():String { return Os.hostname(); }
+	
+	/**
+	 * Flag that indicates the platform is unix.
+	 */
+	public var unix(get, never):Bool;
+	private function get_unix():Bool { return !(new RegExp("^win").test(Node.process.platform)); }
 	
 	/**
 	 * CTOR.
